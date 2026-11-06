@@ -1,3 +1,13 @@
+# ==============================================================================
+# Product:       lh-ssl-tracker (lh-ssl)
+# Module:        src.lh_ssl_tracker.exporters.json_exporter
+# Role:          SARIF, JSON & Rich Terminal Table Exporters
+# Organization:  Logihertz Systems (OPC) Private Limited (logihertzsystems)
+# Creator:       Sameer Tawade (Creator, Founder, Director & Whole and Sole Developer)
+# Contact:       ops@logihertz.com | https://logihertz.com/
+# License:       Apache License 2.0 (SPDX-License-Identifier: Apache-2.0)
+# ==============================================================================
+
 """Structured JSON exporter for audit reports.
 
 Serializes audit reports, security findings, certificate metrics,

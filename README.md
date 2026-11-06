@@ -1,33 +1,42 @@
 # lh-ssl-tracker
 
-[![CI](https://github.com/logihertz/lh-ssl-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/logihertz/lh-ssl-tracker/actions/workflows/ci.yml)
+[![CI](https://github.com/Logihertz-Systems-OPC-Pvt-Ltd/lh-ssl-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/Logihertz-Systems-OPC-Pvt-Ltd/lh-ssl-tracker/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
-An enterprise Certificate Transparency (CT) log monitor and TLS/SSL certificate expiration tracker developed by **Logihertz Systems OPC Pvt Ltd**.
+An enterprise tls/ssl certificate & ct log monitor developed by **Logihertz Systems (OPC) Private Limited**.
 
-`lh-ssl-tracker` audits internal and external infrastructure for upcoming certificate expirations, SLA policy violations, deprecated cryptographic parameters, and unauthorized public subdomain issuances.
+Audits live TLS endpoints, local X.509 PEM certificate bundles, and Certificate Transparency (crt.sh) feeds for imminent SLA expirations, weak RSA/ECC keys, SHA-1/MD5 signatures, SAN mismatches, and rogue shadow subdomains.
 
 ---
 
 ## Key Features
 
-- **Live Endpoint Auditing**: Connect to remote TLS services (`host:port`) using Server Name Indication (SNI) to evaluate live peer certificates without disrupting connections.
-- **Local Bundle Auditing**: Inspect local X.509 PEM certificate bundles, trust stores, and intermediate chains in bulk.
-- **SLA & Expiration Tracking**: Configurable warning (`--warn-days`) and critical (`--crit-days`) thresholds to preempt outages and ensure SLA compliance.
-- **Cryptographic Strength Analyzer**:
-  - Flags insecure and deprecated signature hashing algorithms (MD5, SHA-1).
-  - Flags insufficient public key bit lengths (RSA < 2048-bit, ECC < 224-bit).
-  - Detects self-signed certificates and untrusted CA issuers.
-- **Hostname & SAN Verification**: Validates target hostnames against Subject Common Names (CN) and Subject Alternative Names (SANs) according to RFC 6125 wildcard matching rules.
-- **Certificate Transparency (CT) Monitoring**: Ingests public CT log feeds (crt.sh JSON schema or local snapshots) and compares issued certificates against approved asset allowlists to detect rogue certificates, shadow subdomains, and unauthorized CAs.
-- **Zero-Dependency Cryptography**: Built with a clean-room ASN.1 DER parser written in pure Python 3.11+ standard library, eliminating external C-binding vulnerabilities and platform build issues.
-- **Multi-Format Reporting**:
-  - **Terminal Tables**: Colored tables, badges, and audit summary panels powered by `rich`.
-  - **Structured JSON**: Machine-readable output for SIEM, CMDB, and log ingestion.
-  - **OASIS SARIF v2.1.0**: Native format for GitHub Code Scanning and security dashboards.
+- **Live Endpoint Auditing**: Connects to remote TLS services using Server Name Indication (SNI) to evaluate peer certificates non-disruptively.
+- **Local Bundle Auditing**: Inspects local X.509 PEM certificate bundles, trust stores, and intermediate chains in bulk.
+- **SLA Expiration Tracking**: Configurable warning (`--warn-days`) and critical (`--crit-days`) thresholds to preempt service outages.
+- **Cryptographic Strength Analyzer**: Flags weak signature hashes (MD5, SHA-1), short RSA keys (< 2048-bit), and self-signed certificates.
+- **Certificate Transparency (CT) Monitoring**: Ingests public CT log feeds and compares issued certs against approved subdomain allowlists.
+- **Multi-Format Reporting**: Outputs rich terminal tables, structured JSON, and OASIS SARIF v2.1.0.
+
+---
+
+## Core Detection Rules
+
+| Rule ID | Severity | Description |
+|:---|:---:|:---|
+| `SSL-EXP-001` | `CRITICAL` | Certificate validity date has expired |
+| `SSL-EXP-002` | `CRITICAL` | Certificate expires within critical SLA threshold (<= crit-days) |
+| `SSL-EXP-003` | `WARNING` | Certificate expires within warning SLA threshold (<= warn-days) |
+| `SSL-EXP-004` | `CRITICAL` | Certificate NotBefore timestamp is in the future |
+| `SSL-CRYPTO-001` | `CRITICAL` | Insecure signature hash algorithm detected (MD5 or MD2) |
+| `SSL-CRYPTO-002` | `HIGH` | Deprecated SHA-1 signature algorithm detected |
+| `SSL-CRYPTO-003` | `HIGH` | RSA key length is shorter than 2048-bit enterprise minimum |
+| `SSL-CRYPTO-004` | `HIGH` | Elliptic Curve key length is shorter than 224-bit minimum |
+| `SSL-HOST-001` | `HIGH` | Requested hostname does not match Common Name or SANs (RFC 6125) |
+| `CT-ROGUE-001` | `HIGH` | Domain in Certificate Transparency log is not in asset allowlist |
 
 ---
 
@@ -37,7 +46,7 @@ An enterprise Certificate Transparency (CT) log monitor and TLS/SSL certificate 
 
 ```bash
 # Clone the repository
-git clone https://github.com/logihertz/lh-ssl-tracker.git
+git clone https://github.com/Logihertz-Systems-OPC-Pvt-Ltd/lh-ssl-tracker.git
 cd lh-ssl-tracker
 
 # Create virtual environment and install in editable mode with development tools
@@ -56,126 +65,21 @@ pip install -e .
 
 ## CLI Usage
 
-The primary executable entry point is `lh-ssl`.
-
-```
-Usage: lh-ssl [OPTIONS] COMMAND [ARGS]...
-
-Commands:
-  check         Inspect live TLS endpoints for expiration, cryptographic strength, and SAN mismatches.
-  monitor-ct    Analyze Certificate Transparency log JSON feeds to detect shadow subdomains and rogue CAs.
-  audit-bundle  Audit local PEM certificate bundles for expiration, weak cryptographic parameters, and policies.
-```
-
-### 1. Endpoint Checking (`lh-ssl check`)
-
-Inspect a single host, custom port, or a bulk inventory file.
+The primary executable entrypoint is `lh-ssl` (also accessible via `lh-ssl`).
 
 ```bash
-# Check a single TLS endpoint with custom SLA thresholds
+# Check a live TLS endpoint with SLA thresholds
 lh-ssl check api.example.com:443 --warn-days 30 --crit-days 7
 
-# Inspect bulk inventory list from file
-lh-ssl check targets.txt --format table
+# Monitor public CT logs against an approved allowlist
+lh-ssl monitor-ct example.com --ct-feed ct_feed.json --allowlist subdomains.txt
 
-# Export findings to OASIS SARIF format for CI/CD
-lh-ssl check targets.txt --format sarif --output results.sarif
+# Audit a local PEM certificate bundle
+lh-ssl audit-bundle /etc/ssl/certs/bundle.pem --format json
+
+# Export findings to OASIS SARIF v2.1.0
+lh-ssl check targets.txt --format sarif --output ssl-findings.sarif
 ```
-
-#### Target Inventory Format (`targets.txt`)
-
-```text
-# Production edge endpoints
-app.example.com:443
-api.example.com:443
-
-# Internal services
-internal.vpn.example.com:8443
-192.168.1.50:443
-```
-
----
-
-### 2. Certificate Transparency Monitoring (`lh-ssl monitor-ct`)
-
-Monitor public CT logs for a domain against an approved subdomain allowlist.
-
-```bash
-lh-ssl monitor-ct example.com \
-  --ct-feed ct_feed.json \
-  --allowlist subdomains.txt \
-  --format table
-```
-
-#### Allowlist Format (`subdomains.txt`)
-
-```text
-# Approved production domains
-example.com
-www.example.com
-api.example.com
-
-# Wildcard patterns supported
-*.internal.example.com
-*.staging.example.com
-```
-
-#### Sample CT Log JSON (`ct_feed.json` from crt.sh)
-
-```json
-[
-  {
-    "id": 12345678,
-    "issuer_name": "C=US, O=Let's Encrypt, CN=R3",
-    "common_name": "api.example.com",
-    "name_value": "api.example.com\nwww.example.com",
-    "not_before": "2026-01-01T00:00:00",
-    "not_after": "2026-04-01T00:00:00"
-  },
-  {
-    "id": 12345679,
-    "issuer_name": "C=US, O=Let's Encrypt, CN=R3",
-    "common_name": "shadow-test.example.com",
-    "name_value": "shadow-test.example.com",
-    "not_before": "2026-01-01T00:00:00",
-    "not_after": "2026-04-01T00:00:00"
-  }
-]
-```
-
----
-
-### 3. PEM Bundle Auditing (`lh-ssl audit-bundle`)
-
-Audit local certificate files, trust bundles, and CA certificate packages.
-
-```bash
-# Audit certificate bundle
-lh-ssl audit-bundle /etc/ssl/certs/bundle.pem --warn-days 30
-
-# Export structured JSON report
-lh-ssl audit-bundle /etc/ssl/certs/bundle.pem --format json --output audit-report.json
-```
-
----
-
-## Security Rules Reference
-
-| Rule ID | Name | Severity | Description |
-|:---|:---|:---|:---|
-| `SSL-EXP-001` | CertificateExpired | `CRITICAL` | Certificate validity date has expired. |
-| `SSL-EXP-002` | CriticalExpirationImminent | `CRITICAL` | Certificate expires within critical SLA threshold (`<= crit-days`). |
-| `SSL-EXP-003` | UpcomingCertificateExpiration | `WARNING` | Certificate expires within warning threshold (`<= warn-days`). |
-| `SSL-EXP-004` | CertificateNotYetValid | `CRITICAL` | Certificate NotBefore timestamp is in the future. |
-| `SSL-CRYPTO-001` | InsecureSignatureAlgorithmMD5 | `CRITICAL` | MD5 or MD2 signature hash algorithm detected. |
-| `SSL-CRYPTO-002` | DeprecatedSignatureAlgorithmSHA1 | `HIGH` | Deprecated SHA-1 signature algorithm detected. |
-| `SSL-CRYPTO-003` | InsufficientRSAKeyLength | `HIGH` | RSA key length is shorter than the 2048-bit enterprise minimum. |
-| `SSL-CRYPTO-004` | InsufficientECCKeyLength | `HIGH` | Elliptic Curve key length is shorter than the 224-bit minimum. |
-| `SSL-HOST-001` | HostnameSANMismatch | `HIGH` | Requested hostname does not match Common Name or SANs (RFC 6125). |
-| `SSL-TRUST-001` | SelfSignedCertificate | `WARNING` | Self-signed certificate (untrusted by standard public PKI). |
-| `CT-ROGUE-001` | RogueShadowSubdomainDetected | `HIGH` | Domain in CT logs is not present in approved asset allowlist. |
-| `CT-UNEXPECTED-CA-001` | UnexpectedCertificateAuthority | `WARNING` | Certificate issued by an unauthorized Certificate Authority. |
-| `SSL-CONN-001` | TLSConnectionFailure | `CRITICAL` | Network timeout, DNS failure, or TLS handshake refusal. |
 
 ---
 
@@ -183,29 +87,45 @@ lh-ssl audit-bundle /etc/ssl/certs/bundle.pem --format json --output audit-repor
 
 | Exit Code | Meaning |
 |:---:|:---|
-| `0` | All certificates compliant; no critical or high severity findings. |
-| `1` | One or more `CRITICAL` or `HIGH` severity issues detected. |
-| `2` | Execution error (invalid arguments, missing input files, malformed JSON). |
+| `0` | All audits and security checks passed; no policy violations detected. |
+| `1` | One or more security findings, policy violations, or compliance failures detected. |
+| `2` | Execution error (invalid arguments, missing input files, malformed syntax). |
 
 ---
 
+## Documentation
+
+Comprehensive enterprise documentation is available in the [`docs/`](docs/) directory and repository root:
+
+- **[Architecture & Design](docs/ARCHITECTURE.md)**: Zero-daemon clean-room architecture, module responsibilities, domain models, and 0–100 risk score calculation formula.
+- **[Security Rules Reference](docs/RULES.md)**: Exhaustive catalog of all 10 detection rules with threat models, severities, and remediation guides.
+- **[CLI Usage Guide](docs/USAGE.md)**: Complete command-line manual, flags, exit codes, CI/CD SARIF upload workflows, and JSON pipelines.
+- **[Test & Verification Declaration](docs/TESTING.md)**: Audited test inventory, AST security verification, SAST audit results, and per-module code coverage metrics.
+- **[Changelog](CHANGELOG.md)**: Semantic release history and detailed changelog entries.
+- **[Contributing Guidelines](CONTRIBUTING.md)**: Developer setup, coding standards, line length, typing, and PR requirements.
+- **[Security Policy](SECURITY.md)**: Vulnerability disclosure procedure, reporting email, and 48-hour response SLA.
+- **[Legal Notice & Attributions](NOTICE)**: Apache-2.0 Section 4 legal notice, trademark reservations, and third-party software attributions.
+
 ## Development & Testing
 
-```bash
-# Run unit tests with code coverage
-uv run pytest --cov=lh_ssl_tracker --cov-report=term-missing
+Run all project linters, security audits, and test suites:
 
+```bash
 # Run code style and lint checks
-uv run ruff check .
+uv run ruff check src/ tests/
 
 # Run static application security testing (SAST)
 uv run bandit -r src/
+
+# Run unit and integration tests with coverage
+uv run pytest
 ```
 
 ---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache-2.0 License - see the [LICENSE](LICENSE) and [NOTICE](NOTICE) files for details.
 
-Developed with precision by **Logihertz Systems OPC Pvt Ltd**.
+Developed with precision by **Logihertz Systems (OPC) Private Limited** (`logihertzsystems`).  
+Created, architected, and engineered by **Sameer Tawade** (Creator, Founder, Director & Whole and Sole Developer — `ops@logihertz.com`).

@@ -1,3 +1,13 @@
+# ==============================================================================
+# Product:       lh-ssl-tracker (lh-ssl)
+# Module:        tests.test_coverage_boost
+# Role:          Test Suite & Rule Verification
+# Organization:  Logihertz Systems (OPC) Private Limited (logihertzsystems)
+# Creator:       Sameer Tawade (Creator, Founder, Director & Whole and Sole Developer)
+# Contact:       ops@logihertz.com | https://logihertz.com/
+# License:       Apache License 2.0 (SPDX-License-Identifier: Apache-2.0)
+# ==============================================================================
+
 """Additional targeted unit tests to ensure high test coverage across all modules."""
 
 from __future__ import annotations

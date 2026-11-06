@@ -2,13 +2,16 @@
 
 ## Overview
 
-Security is a primary pillar of `lh-ssl-tracker`. We take the security of enterprise infrastructure, certificate analysis, and data integrity seriously. This document outlines our vulnerability disclosure policy and security guidelines.
+`lh-ssl-tracker` is an open-source security tool developed by **Logihertz Systems (OPC) Private Limited**.
+Because security tools must maintain the highest standards of safety and integrity, `lh-ssl-tracker`
+is engineered with a zero-daemon, clean-room design that operates entirely offline. It does not
+transmit telemetry, execute external network calls, or require persistent background daemons.
 
 ---
 
 ## Supported Versions
 
-Only the latest release of `lh-ssl-tracker` receives active security updates and vulnerability patches.
+Only the latest active minor release of `lh-ssl-tracker` receives security updates and bug fixes.
 
 | Version | Supported          |
 |:-------:|:------------------:|
@@ -19,28 +22,30 @@ Only the latest release of `lh-ssl-tracker` receives active security updates and
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability or weakness in `lh-ssl-tracker`, please follow responsible disclosure principles. **Do not create a public GitHub issue for security vulnerabilities.**
+If you discover a security vulnerability, parser flaw, or denial-of-service issue in `lh-ssl-tracker`,
+please report it responsibly through our security response channel.
+**Do not create a public GitHub issue for security vulnerabilities.**
 
-### Disclosure Process
+### Vulnerability Reporting Process
 
-1. **Email Notification**: Send a detailed report to `security@logihertz.com` with the subject line `[SECURITY] lh-ssl-tracker: <Brief Description>`.
-2. **Details to Include**:
-   - Component affected (e.g. ASN.1 parser, scanner, CT monitor, exporters).
-   - Description of the vulnerability and its potential security impact.
-   - Minimal reproducible proof-of-concept (PoC) or sample input (e.g., malformed PEM, malicious CT feed).
-   - Any remediation suggestions or pull requests you have prepared.
+1. **Email Details**: Send an advisory email to:
+   **ops@logihertz.com**
+2. **Include Key Information**:
+   - Component / module name affected
+   - Specific version of `lh-ssl-tracker`
+   - Clear description of the vulnerability and potential security impact
+   - Minimal reproduction snippet, proof-of-concept payload, or configuration manifest
 3. **Response Timeline**:
-   - **Acknowledgment**: Within 48 hours of initial receipt.
-   - **Assessment & Triage**: Within 5 business days.
-   - **Patch & Advisory Release**: Coordinated with the reporter before public disclosure.
+   - **Acknowledgment**: Within **48 hours** of receiving your report.
+   - **Triage & Status**: Within **3 business days** with preliminary assessment and reproduction verification.
+   - **Remediation & Patch**: We aim to release a verified patch within **5 business days** for high or critical severity issues.
 
 ---
 
-## Cryptographic Security Practices
+## Security Engineering Standards
 
-`lh-ssl-tracker` enforces strict cryptographic hygiene:
-- **Clean-Room Architecture**: Zero untrusted C-extensions for ASN.1 decoding.
-- **Safe Socket Handling**: Connections to untrusted endpoints default to non-blocking timeouts to prevent resource exhaustion or DoS.
-- **Input Validation**: Strict bounds checking on ASN.1 DER length descriptors to prevent buffer overflows or unbounded memory allocation.
-- **Safe Output Serialization**: Automated schema validation and sanitization for JSON and OASIS SARIF v2.1.0 output streams.
-
+`lh-ssl-tracker` enforces rigorous internal engineering controls:
+- **100% Offline Static Analysis**: All inspection and parsing occurs locally in memory without remote calls.
+- **Automated SAST**: Automated static analysis security testing via Bandit on every commit and pull request.
+- **Linting & Code Quality**: Strict formatting and linting via Ruff with a 100-character line length limit.
+- **Strict Typing**: Type annotations enforced across all source modules with `from __future__ import annotations`.

@@ -1,3 +1,13 @@
+# ==============================================================================
+# Product:       lh-ssl-tracker (lh-ssl)
+# Module:        src.lh_ssl_tracker.exporters.table
+# Role:          Core Security Engine Component
+# Organization:  Logihertz Systems (OPC) Private Limited (logihertzsystems)
+# Creator:       Sameer Tawade (Creator, Founder, Director & Whole and Sole Developer)
+# Contact:       ops@logihertz.com | https://logihertz.com/
+# License:       Apache License 2.0 (SPDX-License-Identifier: Apache-2.0)
+# ==============================================================================
+
 """Rich terminal table exporter for audit reports.
 
 Renders formatted tables, status badges, and metric summary panels

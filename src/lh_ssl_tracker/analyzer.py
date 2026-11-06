@@ -1,3 +1,13 @@
+# ==============================================================================
+# Product:       lh-ssl-tracker (lh-ssl)
+# Module:        src.lh_ssl_tracker.analyzer
+# Role:          Security Analysis & Rule Evaluation Engine
+# Organization:  Logihertz Systems (OPC) Private Limited (logihertzsystems)
+# Creator:       Sameer Tawade (Creator, Founder, Director & Whole and Sole Developer)
+# Contact:       ops@logihertz.com | https://logihertz.com/
+# License:       Apache License 2.0 (SPDX-License-Identifier: Apache-2.0)
+# ==============================================================================
+
 """Cryptographic strength and expiration analyzer for TLS certificates.
 
 Evaluates expiration windows against warning and critical thresholds,

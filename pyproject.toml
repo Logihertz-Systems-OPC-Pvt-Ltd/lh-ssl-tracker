@@ -5,14 +5,26 @@ build-backend = "hatchling.build"
 [project]
 name = "lh-ssl-tracker"
 version = "0.1.0"
-description = "Enterprise TLS/SSL certificate expiration tracker and Certificate Transparency monitor"
+description = "Audits live TLS endpoints, local X.509 PEM certificate bundles, and Certificate Transparency (crt.sh) feeds for imminent SLA expirations, weak RSA/ECC keys, SHA-1/MD5 signatures, SAN mismatches, and rogue shadow subdomains."
 readme = "README.md"
 requires-python = ">=3.11"
-license = "MIT"
+license = "Apache-2.0"
 authors = [
-    { name = "Logihertz Systems OPC Pvt Ltd" }
+    { name = "logihertzsystems", email = "ops@logihertz.com" },
+    { name = "Sameer Tawade (Creator, Founder, Director & Sole Developer)", email = "ops@logihertz.com" },
 ]
-keywords = ["ssl", "tls", "x509", "certificate-transparency", "security", "audit"]
+maintainers = [
+    { name = "Logihertz Systems (OPC) Private Limited", email = "ops@logihertz.com" },
+]
+keywords = [
+    "tls-security",
+    "ssl-certificate",
+    "certificate-transparency",
+    "x509",
+    "pki-audit",
+    "sarif",
+    "logihertz",
+]
 dependencies = [
     "typer>=0.9.0",
     "rich>=13.0.0",
@@ -25,6 +37,13 @@ dev = [
     "ruff>=0.4.0",
     "bandit>=1.7.8",
 ]
+
+
+[project.urls]
+Homepage = "https://github.com/Logihertz-Systems-OPC-Pvt-Ltd/lh-ssl-tracker"
+Repository = "https://github.com/Logihertz-Systems-OPC-Pvt-Ltd/lh-ssl-tracker"
+Documentation = "https://github.com/Logihertz-Systems-OPC-Pvt-Ltd/lh-ssl-tracker#documentation"
+Issues = "https://github.com/Logihertz-Systems-OPC-Pvt-Ltd/lh-ssl-tracker/issues"
 
 [project.scripts]
 lh-ssl = "lh_ssl_tracker.cli:app"

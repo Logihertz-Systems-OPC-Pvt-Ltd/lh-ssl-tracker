@@ -1,3 +1,13 @@
+# ==============================================================================
+# Product:       lh-ssl-tracker (lh-ssl)
+# Module:        src.lh_ssl_tracker.exporters.sarif
+# Role:          Core Security Engine Component
+# Organization:  Logihertz Systems (OPC) Private Limited (logihertzsystems)
+# Creator:       Sameer Tawade (Creator, Founder, Director & Whole and Sole Developer)
+# Contact:       ops@logihertz.com | https://logihertz.com/
+# License:       Apache License 2.0 (SPDX-License-Identifier: Apache-2.0)
+# ==============================================================================
+
 """OASIS SARIF v2.1.0 format exporter for security findings.
 
 Generates standard SARIF reports compatible with GitHub Code Scanning,
@@ -213,7 +223,7 @@ def export_sarif(report: AuditReport, indent: int = 2) -> str:
                     "driver": {
                         "name": "lh-ssl-tracker",
                         "version": "0.1.0",
-                        "informationUri": "https://github.com/logihertz/lh-ssl-tracker",
+                        "informationUri": "https://github.com/Logihertz-Systems-OPC-Pvt-Ltd/lh-ssl-tracker",
                         "rules": list(rules_dict.values()),
                     }
                 },

@@ -1,10 +1,19 @@
-import re
+# ==============================================================================
+# Product:       lh-ssl-tracker (lh-ssl)
+# Module:        tests.test_cli
+# Role:          Test Suite & Rule Verification
+# Organization:  Logihertz Systems (OPC) Private Limited (logihertzsystems)
+# Creator:       Sameer Tawade (Creator, Founder, Director & Whole and Sole Developer)
+# Contact:       ops@logihertz.com | https://logihertz.com/
+# License:       Apache License 2.0 (SPDX-License-Identifier: Apache-2.0)
+# ==============================================================================
 
 """Unit tests for the CLI interface using Typer CliRunner."""
 
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from unittest.mock import patch
 
