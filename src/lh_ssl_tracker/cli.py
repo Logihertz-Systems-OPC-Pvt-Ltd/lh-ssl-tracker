@@ -32,6 +32,7 @@ app = typer.Typer(
     name="lh-ssl",
     help="Enterprise TLS/SSL Certificate Tracker & CT Monitor by Logihertz Systems OPC Pvt Ltd.",
     no_args_is_help=True,
+    rich_markup_mode=None,
 )
 console = Console()
 

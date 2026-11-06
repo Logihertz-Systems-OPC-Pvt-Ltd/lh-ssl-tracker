@@ -1,3 +1,5 @@
+import re
+
 """Unit tests for the CLI interface using Typer CliRunner."""
 
 from __future__ import annotations
@@ -20,9 +22,11 @@ def test_cli_help() -> None:
     assert res.exit_code == 0
     assert "Enterprise TLS/SSL Certificate Tracker" in res.stdout
 
-    res_check = runner.invoke(app, ["check", "--help"])
+    res_check = runner.invoke(
+        app, ["check", "--help"], env={"COLUMNS": "160", "NO_COLOR": "1", "TERM": "dumb"}
+    )
     assert res_check.exit_code == 0
-    assert "--warn-days" in res_check.stdout
+    assert "--warn-days" in re.sub(r"\x1b\[[0-9;]*[a-zA-Z]", "", res_check.stdout)
 
     res_ct = runner.invoke(app, ["monitor-ct", "--help"])
     assert res_ct.exit_code == 0
