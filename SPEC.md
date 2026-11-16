@@ -100,7 +100,7 @@ The detection engine evaluates configurations, manifests, firmware, protocols, a
 | `LH-SSL-007` | `HIGH` | `10` | `CWE-330` | PRNG unseeded or failing continuous statistical health tests | Incorporate NIST SP 800-90B continuous entropy health testing |
 | `LH-SSL-008` | `MEDIUM` | `4` | `CWE-285` | Coarse-grained permissions allowing lateral privilege escalation | Implement fine-grained RBAC and granular authorization checks |
 | `LH-SSL-009` | `MEDIUM` | `4` | `CWE-400` | Missing rate limits or burst quotas on expensive operations | Configure token-bucket throttling and bounded allocation caps |
-| `LH-SSL-010` | `LOW` | `1` | `CWE-778` | Security events not recorded to a tamper-evident audit log | Enable structured hash-chained audit logging to /var/log/struct-os.log |
+| `LH-SSL-010` | `LOW` | `1` | `CWE-778` | Security events not recorded to a tamper-evident audit log | Enable structured hash-chained audit logging to /var/log/lh-ssl-tracker.log |
 
 ---
 
@@ -143,23 +143,36 @@ Exported SARIF documents validate against the official OASIS schema (`sarif-sche
 
 ---
 
-## Section 6: Future Development Roadmap & Extension Architecture
+## 6. Standalone Future Development Roadmap (`v0.2.0` — `v0.5.0`)
 
-### Milestone v0.2.0: Modular Extensions & Telemetry Streaming
-- **Policy Pack Plugin Hooks**: Enable external declarative YAML/JSON rule-pack loading without source modification.
-- **Hardware Telemetry Streaming**: Real-time integration with SPI, I2C, UART, CAN, and eBPF kernel event rings.
-- **Configurable Severity Weights**: Support custom industrial profiles (e.g. Nuclear/Medical safety vs. Commercial IoT).
+`lh-ssl-tracker` is developed as an independent, standalone open-source project. The following roadmap defines the planned architectural, algorithmic, and protocol enhancements for upcoming point releases of `lh-ssl-tracker`:
 
-### Milestone v0.5.0: Native STRUCT OS Integration & Daemonless IPC
-- **STRUCT OS Security Bus**: Native zero-copy shared memory integration with the STRUCT OS Security Command Center.
-- **Automated Remediation Synthesis**: Direct IPC bridge with `lh-auto-remediation` for automatic synthesizing of verified unified diffs.
-- **Hardware Root-of-Trust Attestation**: Cryptographic sealing of telemetry reports via TPM 2.0 PCR-bound quotes.
+| Target Release | Milestone Focus | Planned Technical Deliverables for `lh-ssl-tracker` |
+|---|---|---|
+| **`v0.2.0`** | Parser & Protocol Expansion | Add offline PEM/DER X.509 bundle chain validation, RFC 6962 Certificate Transparency (SCT) extension parsing, and OCSP Stapling checks. |
+| **`v0.3.0`** | Deep Algorithmic & Stateful Analysis | Implement TLS 1.2/1.3 cipher-suite preference ordering analysis, weak DH group / RSA modulus detection, and Post-Quantum hybrid KEM (X25519MLKEM768) readiness checks. |
+| **`v0.4.0`** | Remediation, Synthesis & Format Interop | Add DANE TLSA and DNS CAA cross-verification against active X.509 issuer hierarchies and ACME renewal window alerts. |
+| **`v0.5.0`** | High-Throughput Performance & Formal Verification | Synthesize hardened NGINX, HAProxy, and Envoy TLS configuration profiles compliant with Mozilla Modern and NIST SP 800-52 Rev. 2 baselines. |
 
-### Milestone v1.0.0: High-Assurance Certification & Hardening
-- **FIPS 140-3 Validation**: Cryptographic module boundary verification and NIST CAVP compliance testing.
-- **Common Criteria EAL4+ Alignment**: Formal verification of deterministic security targets and functional invariants.
-- **Automotive & Industrial Compliance**: Formal baseline compliance with ISO 21434 (Automotive Cybersecurity) and IEC 62443 (Industrial Automation & Control Systems).
-- **Signed Binary Attestation**: In-toto attestation and Cosign cryptographic signing across all release artifacts.
+### 6.1 `v0.2.0` — Parser & Protocol Expansion
+- **Format & Protocol Ingestion**: Add offline PEM/DER X.509 bundle chain validation, RFC 6962 Certificate Transparency (SCT) extension parsing, and OCSP Stapling checks.
+- **Zero-Dependency Architecture**: Pure standard library implementation with deterministic parsing guarantees and strict error handling.
+- **Verification & Telemetry**: Regression test suites verifying schema edge-cases, malformed payload rejections, and SARIF v2.1.0 output fidelity.
+
+### 6.2 `v0.3.0` — Deep Algorithmic & Stateful Analysis
+- **Algorithmic Core**: Implement TLS 1.2/1.3 cipher-suite preference ordering analysis, weak DH group / RSA modulus detection, and Post-Quantum hybrid KEM (X25519MLKEM768) readiness checks.
+- **State Machine & Analysis Engine**: High-fidelity state tracking, cycle detection, and invariant checking with minimal computational overhead.
+- **Differential & Regression Verification**: Comprehensive test harnesses covering stateful transitions, edge conditions, and mathematical boundary constraints.
+
+### 6.3 `v0.4.0` — Remediation, Synthesis & Format Interoperability
+- **Synthesis & Interoperability**: Add DANE TLSA and DNS CAA cross-verification against active X.509 issuer hierarchies and ACME renewal window alerts.
+- **Automated Remediation Workflows**: Idempotent generation of verified configuration patches, policy rules, and standardized cross-format exports.
+- **Contract & Artifact Validation**: Cryptographic baseline verification and end-to-end integration testing for synthesized deliverables.
+
+### 6.4 `v0.5.0` — High-Throughput Performance & Formal Verification
+- **High-Throughput Optimization**: Synthesize hardened NGINX, HAProxy, and Envoy TLS configuration profiles compliant with Mozilla Modern and NIST SP 800-52 Rev. 2 baselines.
+- **Hardware & Kernel Acceleration**: Vectorized SIMD/eBPF/sub-millisecond streaming execution with bounded memory allocation.
+- **Formal Verification & Assurance**: Mathematical proof of invariant preservation, false-positive calibration, and high-assurance certification baselines.
 
 ---
 
